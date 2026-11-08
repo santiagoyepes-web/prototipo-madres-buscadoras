@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Buscadoras: entre el duelo y la justicia. Investigación periodística interactiva sobre la lucha de las mujeres buscadoras en Colombia frente a la desaparición forzada."
+    />
+    <title>Buscadoras: entre el duelo y la justicia</title>
+    <!-- Importmap para garantizar compatibilidad tanto en Vite como en servidores estáticos (ej. Live Server) -->
+    <script type="importmap">
+      {
+        "imports": {
+          "gsap": "./node_modules/gsap/index.js",
+          "gsap/": "./node_modules/gsap/",
+          "gsap/ScrollTrigger": "./node_modules/gsap/ScrollTrigger.js",
+          "gsap/ScrollToPlugin": "./node_modules/gsap/ScrollToPlugin.js",
+          "gsap/SplitText": "./node_modules/gsap/SplitText.js",
+          "gsap/Draggable": "./node_modules/gsap/Draggable.js",
+          "gsap/InertiaPlugin": "./node_modules/gsap/InertiaPlugin.js",
+          "gsap/Physics2DPlugin": "./node_modules/gsap/Physics2DPlugin.js",
+          "gsap/Flip": "./node_modules/gsap/Flip.js",
+          "gsap/DrawSVGPlugin": "./node_modules/gsap/DrawSVGPlugin.js",
+          "gsap/CustomEase": "./node_modules/gsap/CustomEase.js"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="./src/styles/variables.css" />
+    <link rel="stylesheet" href="./src/styles/base.css" />
+    <link rel="stylesheet" href="./src/styles/sections.css" />
+  </head>
+  <body>
+    <!-- Control global de sonido (esquina superior derecha fija) -->
+    <div class="global-audio-bar" role="region" aria-label="Control de sonido ambiental">
+      <button
+        id="btn-audio-toggle"
+        type="button"
+        class="btn-audio-toggle"
+        aria-pressed="false"
+        aria-label="Activar sonido ambiental"
+      >
+        <span class="audio-dot" aria-hidden="true"></span>
+        <span class="btn-ui-label">Sonido: Silenciado</span>
+      </button>
+    </div>
+
+    <!-- Capa fija a pantalla completa para la transición de huella dactilar -->
+    <div
+      id="transicion"
+      role="status"
+      aria-live="polite"
+      aria-hidden="true"
+    >
+      <span class="sr-only transicion-sr-text"></span>
+      <div class="transicion-huella-wrap" aria-hidden="true">
+        <img
+          class="huella-raster-ref"
+          src="./assets/icons/transicion/huella.png"
+          alt=""
+          decoding="async"
+        />
+        <!-- Crestas vectoriales de huella ordenadas de afuera hacia adentro para DrawSVGPlugin -->
+        <svg
+          class="huella-svg-draw"
+          viewBox="0 0 200 260"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <!-- Crestas exteriores (afuera) -->
+          <path class="huella-ridge" d="M 65 24 C 90 16, 110 16, 135 24" />
+          <path class="huella-ridge" d="M 42 44 C 75 24, 125 24, 158 44" />
+          <path class="huella-ridge" d="M 26 74 C 58 36, 142 36, 174 74" />
+          <path class="huella-ridge" d="M 18 112 C 36 52, 164 52, 182 112" />
+          <!-- Crestas intermedias -->
+          <path class="huella-ridge" d="M 18 154 C 22 82, 62 56, 100 56 C 138 56, 178 82, 180 156" />
+          <path class="huella-ridge" d="M 26 192 C 26 112, 58 72, 100 72 C 142 72, 172 112, 168 190" />
+          <path class="huella-ridge" d="M 38 220 C 36 138, 62 88, 100 88 C 138 88, 158 138, 152 216" />
+          <path class="huella-ridge" d="M 54 238 C 48 158, 68 104, 100 104 C 132 104, 146 158, 136 232" />
+          <!-- Crestas interiores (adentro / núcleo de identidad) -->
+          <path class="huella-ridge" d="M 70 246 C 64 176, 76 120, 100 120 C 124 120, 132 174, 120 242" />
+          <path class="huella-ridge" d="M 86 248 C 80 190, 84 138, 100 138 C 116 138, 118 188, 106 244" />
+          <path class="huella-ridge" d="M 96 236 C 94 196, 94 156, 100 156 C 106 156, 106 184, 100 206" />
+        </svg>
+      </div>
+    </div>
+
+    <main id="app-main">
+      <!-- ====================================================================
+           SECCIÓN 1 — MAPA INTERACTIVO (HOME)
+           ==================================================================== -->
+      <section
+        id="seccion-1"
+        class="app-section"
+        aria-labelledby="titulo-seccion-1"
+      >
+        <div class="section-safe-top">
+          <button
+            type="button"
+            class="btn-huella-home is-home-active"
+            data-home-btn="seccion-1"
+            aria-label="Volver al inicio (Sección 1)"
+            aria-current="location"
+          >
+            <img class="huella-btn-icon" src="./assets/icons/transicion/huella.png" alt="" />
+            <span class="huella-label">Inicio (Mapa)</span>
+          </button>
+
+          <div class="section-actions-right">
+            <button
+              type="button"
+              class="btn-ver-texto"
+              data-direct-text="seccion-1"
+              aria-expanded="false"
+              aria-controls="lectura-seccion-1"
+            >
+              Ver texto directamente
+            </button>
+          </div>
+        </div>
+
+        <header class="section-header">
+          <span class="section-kicker">Buscadoras: entre el duelo y la justicia — Sección I</span>
+          <h1 id="titulo-seccion-1" class="section-title" tabindex="-1">
+            Buscar en un país que normalizó la ausencia
+          </h1>
+          <p class="section-instruction">
+            Explora el mapa en penumbra con la luz para descubrir los caminos de la investigación o pulsa cada nodo.
+          </p>
+        </header>
+
+        <div class="section-workspace has-side-reading" id="workspace-seccion-1">
+          <div
+            class="map-stage-container"
+            id="map-stage-seccion-1"
+            role="region"
+            aria-label="Mapa interactivo de navegación por secciones"
+          >
+            <div class="map-canvas-box" id="map-canvas-box">
+              <div class="map-svg-layer" id="map-svg-holder" aria-hidden="true">
+                <img src="./assets/map/mapa.svg" alt="" style="width:100%;height:100%;object-fit:contain;" />
+              </div>
+              <div class="map-flashlight-overlay" id="map-flashlight" aria-hidden="true"></div>
+              <div class="map-nodes-layer" id="map-nodes-holder">
+                <!-- Nodos pre-renderizados con los iconos de /assets/icons/seccion1/ -->
+                <button
+                  type="button"
+                  class="map-node-btn"
+                  style="left: 48%; top: 25%;"
+                  data-target="seccion-1"
+                  data-node-index="0"
+                  aria-label="Buscar en un país que normalizó la ausencia — Contexto e historia (Sección I). Pulsa para abrir."
+                >
+                  <img src="./assets/icons/seccion1/incognita_n1.svg" alt="" decoding="async" />
+                  <span class="map-node-label" aria-hidden="true">
+                    <span class="map-node-label-text">Buscar en un país que normalizó la ausencia</span>
+                    <span class="map-node-hint">Contexto e historia (Sección I)</span>
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  class="map-node-btn"
+                  style="left: 56%; top: 46%;"
+                  data-target="seccion-2"
+                  data-node-index="1"
+                  aria-label="Del Acuerdo de Paz a la Ley de Mujeres Buscadoras — Reunir indicios (Sección II). Pulsa para abrir."
+                >
+                  <img src="./assets/icons/seccion1/ley_n2.svg" alt="" decoding="async" />
+                  <span class="map-node-label" aria-hidden="true">
+                    <span class="map-node-label-text">Del Acuerdo de Paz a la Ley de Mujeres Buscadoras</span>
+                    <span class="map-node-hint">Reunir indicios (Sección II)</span>
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  class="map-node-btn"
+                  style="left: 29%; top: 56%;"
+                  data-target="seccion-3"
+                  data-node-index="2"
+                  aria-label="Geografías de la ausencia: el Valle del Cauca — Buenaventura, Cali, Palmira y Cartago (Sección III). Pulsa para abrir."
+                >
+                  <img src="./assets/icons/seccion1/mapa2_n3.png" alt="" decoding="async" />
+                  <span class="map-node-label" aria-hidden="true">
+                    <span class="map-node-label-text">Geografías de la ausencia: el Valle del Cauca</span>
+                    <span class="map-node-hint">Buenaventura, Cali, Palmira y Cartago (Sección III)</span>
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  class="map-node-btn"
+                  style="left: 46%; top: 72%;"
+                  data-target="seccion-4"
+                  data-node-index="3"
+                  aria-label="Voces y tensiones: las buscadoras frente al Estado — Rompecabezas de memoria (Sección IV). Pulsa para abrir."
+                >
+                  <img src="./assets/icons/seccion1/voces_n4.svg" alt="" decoding="async" />
+                  <span class="map-node-label" aria-hidden="true">
+                    <span class="map-node-label-text">Voces y tensiones: las buscadoras frente al Estado</span>
+                    <span class="map-node-hint">Rompecabezas de memoria (Sección IV)</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Texto siempre presente en el DOM desde el inicio para lectores de pantalla -->
+          <article
+            id="lectura-seccion-1"
+            class="reading-column"
+            aria-label="Texto de investigación: Buscar en un país que normalizó la ausencia"
+          ></article>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECCIÓN 2 — REUNIR INDICIOS
+           ==================================================================== -->
+      <section
+        id="seccion-2"
+        class="app-section"
+        aria-labelledby="titulo-seccion-2"
+      >
+        <div class="section-safe-top">
+          <button
+            type="button"
+            class="btn-huella-home"
+            data-home-btn="seccion-2"
+            aria-label="Volver al inicio (Sección 1)"
+          >
+            <img class="huella-btn-icon" src="./assets/icons/seccion2/huella_icon.png" alt="" />
+            <span class="huella-label">Volver al mapa</span>
+          </button>
+
+          <div class="section-actions-right">
+            <button
+              type="button"
+              class="btn-ver-texto"
+              data-direct-text="seccion-2"
+              aria-expanded="false"
+              aria-controls="lectura-seccion-2"
+            >
+              Ver texto directamente
+            </button>
+          </div>
+        </div>
+
+        <header class="section-header">
+          <span class="section-kicker">Sección II — Ley de Mujeres Buscadoras</span>
+          <h2 id="titulo-seccion-2" class="section-title" tabindex="-1">
+            Del Acuerdo de Paz a la Ley de Mujeres Buscadoras
+          </h2>
+          <p class="section-instruction">
+            Reúne cada indicio disperso llevándolo hacia el expediente central (o pulsa Enter sobre cada indicio).
+          </p>
+        </header>
+
+        <div class="section-workspace has-side-reading" id="workspace-seccion-2">
+          <div
+            class="indicios-board"
+            id="indicios-board"
+            role="region"
+            aria-label="Área para reunir indicios en el expediente"
+          >
+            <div
+              class="expediente-dropzone"
+              id="expediente-dropzone"
+              aria-label="Expediente central de búsqueda"
+            >
+              <img
+                class="expediente-folder-img"
+                id="expediente-img"
+                src="./assets/icons/seccion2/carpeta.png"
+                alt="Carpeta de expediente"
+              />
+              <span class="expediente-caption" id="expediente-status">0 / 5 indicios reunidos</span>
+              <div class="expediente-slots" id="expediente-slots"></div>
+            </div>
+
+            <!-- 5 indicios de /assets/icons/seccion2/ presentes en el DOM -->
+            <div
+              class="indicio-item"
+              style="left: 10%; top: 16%;"
+              role="button"
+              tabindex="0"
+              data-indicio-index="0"
+              aria-label="Indicio 1: Bota de recorrido territorial. Arrastra al expediente central o presiona Enter para reunir."
+            >
+              <img src="./assets/icons/seccion2/bota.svg" alt="" decoding="async" />
+              <span class="indicio-name">Calzado en terreno</span>
+            </div>
+
+            <div
+              class="indicio-item"
+              style="left: 78%; top: 18%;"
+              role="button"
+              tabindex="0"
+              data-indicio-index="1"
+              aria-label="Indicio 2: Lupa de búsqueda e investigación forense. Arrastra al expediente central o presiona Enter para reunir."
+            >
+              <img src="./assets/icons/seccion2/lupa.jpeg" class="invert-jpeg-white-bg" alt="" decoding="async" />
+              <span class="indicio-name">Investigación</span>
+            </div>
+
+            <div
+              class="indicio-item"
+              style="left: 12%; top: 68%;"
+              role="button"
+              tabindex="0"
+              data-indicio-index="2"
+              aria-label="Indicio 3: Huella de identidad y registro. Arrastra al expediente central o presiona Enter para reunir."
+            >
+              <img src="./assets/icons/seccion2/huella_icon.png" class="invert-dark-icon" alt="" decoding="async" />
+              <span class="indicio-name">Identidad</span>
+            </div>
+
+            <div
+              class="indicio-item"
+              style="left: 78%; top: 66%;"
+              role="button"
+              tabindex="0"
+              data-indicio-index="3"
+              aria-label="Indicio 4: Pala de hallazgo en sitios de interés forense. Arrastra al expediente central o presiona Enter para reunir."
+            >
+              <img src="./assets/icons/seccion2/pala.svg" class="invert-dark-icon" alt="" decoding="async" />
+              <span class="indicio-name">Exhumación</span>
+            </div>
+
+            <div
+              class="indicio-item"
+              style="left: 46%; top: 10%;"
+              role="button"
+              tabindex="0"
+              data-indicio-index="4"
+              aria-label="Indicio 5: Paloma del Punto 5 de Víctimas y Ley 2364. Arrastra al expediente central o presiona Enter para reunir."
+            >
+              <img src="./assets/icons/seccion2/paloma.png" class="invert-dark-icon" alt="" decoding="async" />
+              <span class="indicio-name">Acuerdo de Paz</span>
+            </div>
+          </div>
+
+          <article
+            id="lectura-seccion-2"
+            class="reading-column"
+            aria-label="Texto de investigación: Del Acuerdo de Paz a la Ley de Mujeres Buscadoras"
+          ></article>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECCIÓN 3 — LIBROS POR PAREJAS
+           ==================================================================== -->
+      <section
+        id="seccion-3"
+        class="app-section"
+        aria-labelledby="titulo-seccion-3"
+      >
+        <div class="section-safe-top">
+          <button
+            type="button"
+            class="btn-huella-home"
+            data-home-btn="seccion-3"
+            aria-label="Volver al inicio (Sección 1)"
+          >
+            <img class="huella-btn-icon" src="./assets/icons/seccion3/huella_icon.png" alt="" />
+            <span class="huella-label">Volver al mapa</span>
+          </button>
+
+          <div class="section-actions-right">
+            <button
+              type="button"
+              class="btn-ver-texto"
+              data-direct-text="seccion-3"
+              aria-expanded="false"
+              aria-controls="lectura-seccion-3"
+            >
+              Ver texto directamente
+            </button>
+          </div>
+        </div>
+
+        <header class="section-header">
+          <span class="section-kicker">Sección III — Geografías de la ausencia</span>
+          <h2 id="titulo-seccion-3" class="section-title" tabindex="-1">
+            Geografías de la ausencia: el Valle del Cauca
+          </h2>
+          <p class="section-instruction">
+            Une cada libro con su par territorial de igual color y símbolo (arrástralos o selecciónalos con Enter).
+          </p>
+        </header>
+
+        <div class="section-workspace has-side-reading" id="workspace-seccion-3">
+          <div
+            class="pares-arena"
+            id="pares-arena"
+            role="region"
+            aria-label="Espacio de memoria para unir pares de libros y territorios"
+          >
+            <!-- 6 elementos (3 pares) de /assets/icons/seccion3/ -->
+            <div
+              class="par-token"
+              data-pair="par-a"
+              style="left: 10%; top: 14%;"
+              role="button"
+              tabindex="0"
+              aria-label="Libro verde (Par ◆): Territorios y Buenaventura (Símbolo rombo y borde continuo cálido). Arrastra hacia su par o presiona Enter para seleccionar."
+            >
+              <span class="par-symbol-badge" aria-hidden="true">◆</span>
+              <img src="./assets/icons/seccion3/libro_verde_par_a1.png" alt="" decoding="async" />
+              <span class="par-token-label">Libro ◆</span>
+            </div>
+
+            <div
+              class="par-token"
+              data-pair="par-a"
+              style="left: 72%; top: 64%;"
+              role="button"
+              tabindex="0"
+              aria-label="Territorio Valle y Manglar (Par ◆): Buenaventura (Símbolo rombo y borde continuo cálido). Arrastra hacia su par o presiona Enter para seleccionar."
+            >
+              <span class="par-symbol-badge" aria-hidden="true">◆</span>
+              <img src="./assets/icons/seccion3/cana_par_a2.svg" alt="" decoding="async" />
+              <span class="par-token-label">Territorio ◆</span>
+            </div>
+
+            <div
+              class="par-token"
+              data-pair="par-b"
+              style="left: 68%; top: 14%;"
+              role="button"
+              tabindex="0"
+              aria-label="Libro azul (Par ●): Cali y Palmira (Símbolo círculo y borde discontinuo). Arrastra hacia su par o presiona Enter para seleccionar."
+            >
+              <span class="par-symbol-badge" aria-hidden="true">●</span>
+              <img src="./assets/icons/seccion3/libro_azul_par_b1.png" alt="" decoding="async" />
+              <span class="par-token-label">Libro ●</span>
+            </div>
+
+            <div
+              class="par-token"
+              data-pair="par-b"
+              style="left: 14%; top: 64%;"
+              role="button"
+              tabindex="0"
+              aria-label="Canoa ribereña (Par ●): Cali y Palmira (Símbolo círculo y borde discontinuo). Arrastra hacia su par o presiona Enter para seleccionar."
+            >
+              <span class="par-symbol-badge" aria-hidden="true">●</span>
+              <img src="./assets/icons/seccion3/canoa_par_b2.svg" class="invert-svg" alt="" decoding="async" />
+              <span class="par-token-label">Canoa ●</span>
+            </div>
+
+            <div
+              class="par-token"
+              data-pair="par-c"
+              style="left: 40%; top: 12%;"
+              role="button"
+              tabindex="0"
+              aria-label="Libro amarillo (Par ▲): Cartago y rutas de búsqueda (Símbolo triángulo y borde doble). Arrastra hacia su par o presiona Enter para seleccionar."
+            >
+              <span class="par-symbol-badge" aria-hidden="true">▲</span>
+              <img src="./assets/icons/seccion3/libro_amarillo_par_c1.png" alt="" decoding="async" />
+              <span class="par-token-label">Libro ▲</span>
+            </div>
+
+            <div
+              class="par-token"
+              data-pair="par-c"
+              style="left: 42%; top: 66%;"
+              role="button"
+              tabindex="0"
+              aria-label="Mural de memoria (Par ▲): Cartago (Símbolo triángulo y borde doble). Arrastra hacia su par o presiona Enter para seleccionar."
+            >
+              <span class="par-symbol-badge" aria-hidden="true">▲</span>
+              <img src="./assets/icons/seccion3/mural_par_c2.svg" class="invert-svg" alt="" decoding="async" />
+              <span class="par-token-label">Mural ▲</span>
+            </div>
+          </div>
+
+          <article
+            id="lectura-seccion-3"
+            class="reading-column"
+            aria-label="Texto de investigación: Geografías de la ausencia: el Valle del Cauca"
+          ></article>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECCIÓN 4 — ROMPECABEZAS
+           ==================================================================== -->
+      <section
+        id="seccion-4"
+        class="app-section"
+        aria-labelledby="titulo-seccion-4"
+      >
+        <div class="section-safe-top">
+          <button
+            type="button"
+            class="btn-huella-home"
+            data-home-btn="seccion-4"
+            aria-label="Volver al inicio (Sección 1)"
+          >
+            <img class="huella-btn-icon" src="./assets/icons/seccion4/huella_icon.png" alt="" />
+            <span class="huella-label">Volver al mapa</span>
+          </button>
+
+          <div class="section-actions-right">
+            <button
+              type="button"
+              class="btn-ver-texto"
+              data-direct-text="seccion-4"
+              aria-expanded="false"
+              aria-controls="lectura-seccion-4"
+            >
+              Ver texto directamente
+            </button>
+          </div>
+        </div>
+
+        <header class="section-header">
+          <span class="section-kicker">Sección IV — Voces y tensiones</span>
+          <h2 id="titulo-seccion-4" class="section-title" tabindex="-1">
+            Voces y tensiones: las buscadoras frente al Estado
+          </h2>
+          <p class="section-instruction">
+            Reconstruye la fotografía ubicando cada fragmento en su lugar dentro de la cuadrícula.
+          </p>
+        </header>
+
+        <div class="section-workspace has-side-reading" id="workspace-seccion-4">
+          <div
+            class="puzzle-stage"
+            id="puzzle-stage"
+            role="region"
+            aria-label="Rompecabezas de memoria de las madres buscadoras"
+          >
+            <div class="puzzle-board" id="puzzle-board"></div>
+            <div class="puzzle-tray" id="puzzle-tray" aria-label="Piezas disponibles del rompecabezas"></div>
+          </div>
+
+          <article
+            id="lectura-seccion-4"
+            class="reading-column"
+            aria-label="Texto de investigación: Voces y tensiones: las buscadoras frente al Estado"
+          ></article>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
