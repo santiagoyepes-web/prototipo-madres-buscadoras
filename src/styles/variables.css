@@ -1,0 +1,62 @@
+/**
+ * Variables de diseño según /docs/style-guide.md
+ */
+
+@font-face {
+  font-family: 'Young Serif';
+  src: url('../../assets/fonts/YoungSerif-RegularItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../../assets/fonts/PlayfairDisplay-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Paleta oficial estricta */
+  --color-bg-deep: #0A0A0A;
+  --color-charcoal: #333333;
+  --color-earth: #4B3A2A;
+  --color-umber: #4D1B07;
+  --color-light-warm: #FFEB99;
+  --color-white: #FFFFFF;
+
+  /* Variantes con transparencia de la misma paleta */
+  --color-bg-overlay: rgba(10, 10, 10, 0.94);
+  --color-surface-card: rgba(51, 51, 51, 0.36);
+  --color-surface-earth: rgba(75, 58, 42, 0.32);
+  --color-border-subtle: rgba(255, 235, 153, 0.22);
+  --color-border-muted: rgba(255, 255, 255, 0.14);
+  --color-text-muted: rgba(255, 255, 255, 0.72);
+
+  /* Tipografías */
+  --font-title: 'Young Serif', Georgia, serif;
+  --font-body: 'Playfair Display', Georgia, serif;
+
+  /* Escala fluida con clamp() (base 8px) */
+  --space-xs: clamp(0.5rem, 0.8vw, 0.75rem);
+  --space-sm: clamp(0.75rem, 1.2vw, 1.25rem);
+  --space-md: clamp(1.5rem, 2.5vw, 2.5rem);
+  --space-lg: clamp(2.5rem, 4.5vw, 4.5rem);
+  --space-xl: clamp(4rem, 8vw, 7.5rem);
+
+  /* Zonas seguras de interfaz (--safe-zone-ui): 60px móvil / 72px escritorio */
+  --safe-zone-ui: 60px;
+
+  /* Columna de lectura */
+  --reading-max-width: 680px;
+  --reading-ch: 65ch;
+  --reading-line-height: 1.75;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --safe-zone-ui: 72px;
+  }
+}

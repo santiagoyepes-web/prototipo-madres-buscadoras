@@ -1,0 +1,339 @@
+/**
+ * Estilos base, reset, accesibilidad, zonas seguras y tipografía editorial.
+ * Mobile-first, 100dvh por sección y 35%-40% de espacio vacío como metáfora de ausencia.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: var(--color-bg-deep);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: var(--reading-line-height);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: auto;
+}
+
+body {
+  background-color: var(--color-bg-deep);
+  color: var(--color-white);
+  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+body.is-transitioning {
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Foco accesible visible para teclado */
+:focus-visible {
+  outline: 2px solid var(--color-light-warm);
+  outline-offset: 4px;
+}
+
+/* Utilidad para lectores de pantalla: texto siempre en el DOM */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Botones globales y de sección */
+button {
+  font-family: var(--font-body);
+  color: var(--color-white);
+  background: transparent;
+  border: 1px solid var(--color-border-subtle);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: border-color 0.35s ease, background-color 0.35s ease, opacity 0.35s ease;
+}
+
+button:hover,
+button:focus-visible {
+  border-color: var(--color-light-warm);
+  background-color: var(--color-surface-earth);
+}
+
+/* Control fijo global de sonido (esquina superior derecha) */
+.global-audio-bar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: var(--safe-zone-ui);
+  padding: 0 var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  z-index: 90;
+  pointer-events: none;
+}
+
+.btn-audio-toggle {
+  pointer-events: auto;
+  min-height: 42px;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  background-color: rgba(10, 10, 10, 0.82);
+  backdrop-filter: blur(6px);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+}
+
+.btn-audio-toggle .audio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-light-warm);
+  transition: transform 0.35s ease, background-color 0.35s ease;
+}
+
+.btn-audio-toggle.is-muted .audio-dot {
+  background-color: var(--color-charcoal);
+  transform: scale(0.8);
+}
+
+/* Estructura común de cada una de las 4 secciones */
+.app-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: calc(var(--safe-zone-ui) + var(--space-sm));
+  padding-bottom: calc(var(--safe-zone-ui) + var(--space-md));
+  padding-left: var(--space-md);
+  padding-right: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(51, 51, 51, 0.35);
+  overflow: hidden;
+}
+
+@media (min-width: 960px) {
+  .app-section {
+    padding-left: var(--space-xl);
+    padding-right: var(--space-xl);
+  }
+}
+
+/* Barra superior segura dentro de cada sección */
+.section-safe-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--safe-zone-ui);
+  padding: 0 var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 40;
+  pointer-events: none;
+}
+
+@media (min-width: 960px) {
+  .section-safe-top {
+    padding: 0 var(--space-xl);
+  }
+}
+
+/* Esquina superior izquierda: Icono de huella en todas las secciones (48x48px mín.) */
+.btn-huella-home {
+  pointer-events: auto;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background-color: rgba(10, 10, 10, 0.82);
+  border: 1px solid var(--color-border-subtle);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--color-white);
+  font-size: 0.82rem;
+}
+
+.btn-huella-home img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.btn-huella-home.is-home-active {
+  border-color: var(--color-light-warm);
+  color: var(--color-light-warm);
+}
+
+.btn-huella-home .huella-label {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .btn-huella-home .huella-label {
+    display: inline;
+  }
+}
+
+/* Botón "Ver texto directamente" en cada sección */
+.section-actions-right {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  /* Dejar espacio a la derecha para el botón fijo global de sonido */
+  margin-right: 155px;
+}
+
+.btn-ver-texto {
+  min-height: 42px;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  background-color: rgba(10, 10, 10, 0.82);
+  color: var(--color-light-warm);
+  border: 1px solid var(--color-border-subtle);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.btn-ver-texto[aria-expanded="true"] {
+  background-color: var(--color-surface-earth);
+  border-color: var(--color-light-warm);
+}
+
+/* Cabecera de sección */
+.section-header {
+  max-width: var(--reading-max-width);
+  margin: var(--space-xs) auto var(--space-md) auto;
+  text-align: center;
+  z-index: 15;
+}
+
+.section-kicker {
+  display: block;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-light-warm);
+  opacity: 0.85;
+  margin-bottom: var(--space-xs);
+}
+
+.section-title {
+  font-family: var(--font-title);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(1.5rem, 3vw, 2.45rem);
+  line-height: 1.25;
+  color: var(--color-white);
+  margin-bottom: var(--space-xs);
+}
+
+.section-instruction {
+  font-size: clamp(0.9rem, 1.15vw, 1.02rem);
+  color: var(--color-text-muted);
+  max-width: 54ch;
+  margin: 0 auto;
+}
+
+/* Layout interno de sección: área interactiva + columna de lectura */
+.section-workspace {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .section-workspace.has-side-reading {
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: start;
+  }
+}
+
+/* Contenedor de texto revelado (siempre presente en el DOM para lectores de pantalla) */
+.reading-column {
+  width: 100%;
+  max-width: var(--reading-max-width);
+  margin: 0 auto;
+  padding: var(--space-md);
+  background: linear-gradient(180deg, rgba(51, 51, 51, 0.22) 0%, rgba(10, 10, 10, 0.88) 100%);
+  border-left: 2px solid var(--color-earth);
+  border-radius: 4px;
+  max-height: 58dvh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-earth) var(--color-bg-deep);
+  /* Visualmente oculto al inicio sin sacarlo del árbol de accesibilidad */
+  opacity: 0;
+  pointer-events: none;
+  transition: pointer-events 0.2s;
+}
+
+.reading-column.is-partial {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.reading-column.is-revealed {
+  opacity: 1;
+  pointer-events: auto;
+  border-left-color: var(--color-light-warm);
+}
+
+.editorial-subtitle {
+  font-family: var(--font-title);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+  color: var(--color-light-warm);
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-xs);
+  line-height: 1.35;
+}
+
+.editorial-subtitle:first-child {
+  margin-top: 0;
+}
+
+.editorial-paragraph {
+  font-family: var(--font-body);
+  font-size: clamp(0.98rem, 1.1vw, 1.08rem);
+  line-height: var(--reading-line-height);
+  color: var(--color-white);
+  max-width: var(--reading-ch);
+  margin-bottom: var(--space-md);
+}
+
+.editorial-paragraph em {
+  color: var(--color-light-warm);
+  font-style: italic;
+}
+
+.split-line {
+  overflow: hidden;
+}

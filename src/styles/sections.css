@@ -1,0 +1,502 @@
+/**
+ * Estilos de la capa de transición de huella (#transicion) y de las 4 secciones.
+ * Solo colores de la paleta: #0A0A0A, #333333, #4B3A2A, #4D1B07, #FFEB99, #FFFFFF.
+ */
+
+/* ==========================================================================
+   CAPA DE TRANSICIÓN DE HUELLA (#transicion)
+   ========================================================================== */
+#transicion {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background-color: var(--color-bg-deep);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#transicion.is-active {
+  pointer-events: all;
+}
+
+.transicion-huella-wrap {
+  position: relative;
+  width: clamp(160px, 24vw, 240px);
+  height: clamp(200px, 30vw, 300px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.huella-raster-ref {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.huella-svg-draw {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.huella-ridge {
+  fill: none;
+  stroke: var(--color-light-warm);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.92;
+}
+
+/* ==========================================================================
+   SECCIÓN 1 — MAPA INTERACTIVO EN PENUMBRA + LINTERNA
+   ========================================================================== */
+.map-stage-container {
+  position: relative;
+  width: 100%;
+  min-height: 54dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.map-canvas-box {
+  position: relative;
+  width: clamp(270px, 44vw, 430px);
+  aspect-ratio: 202 / 279.45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  --flashlight-x: 50%;
+  --flashlight-y: 50%;
+}
+
+/* Mapa base en penumbra */
+.map-svg-layer {
+  width: 100%;
+  height: 100%;
+  opacity: 0.46;
+  filter: brightness(0.75);
+  transition: opacity 0.6s ease, filter 0.6s ease;
+}
+
+.map-svg-layer svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.map-svg-layer path {
+  fill: var(--color-earth);
+  stroke: var(--color-light-warm);
+  stroke-width: 0.65;
+}
+
+/* Capa de linterna radial que ilumina cerca del cursor (quickTo) */
+.map-flashlight-overlay {
+  position: absolute;
+  inset: -25%;
+  pointer-events: none;
+  z-index: 4;
+  background: radial-gradient(
+    circle 210px at var(--flashlight-x, 50%) var(--flashlight-y, 50%),
+    rgba(255, 235, 153, 0.24) 0%,
+    rgba(75, 58, 42, 0.14) 45%,
+    rgba(10, 10, 10, 0.58) 82%
+  );
+}
+
+/* Nodos del mapa */
+.map-nodes-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+}
+
+.map-node-btn {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background-color: rgba(10, 10, 10, 0.9);
+  border: 1.5px solid rgba(255, 235, 153, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  opacity: 0.68;
+  filter: brightness(0.88);
+  transition: opacity 0.45s ease, filter 0.45s ease, border-color 0.45s ease, transform 0.45s ease;
+}
+
+.map-node-btn.is-near-light {
+  opacity: 0.94;
+  filter: brightness(1.05);
+}
+
+.map-node-btn:hover,
+.map-node-btn:focus-visible,
+.map-node-btn.is-hovered {
+  opacity: 1;
+  filter: brightness(1.18);
+  border-color: var(--color-light-warm);
+  background-color: var(--color-umber);
+  transform: translate(-50%, -50%) scale(1.1);
+  z-index: 20;
+}
+
+.map-node-btn img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Etiqueta del nodo (revelada con SplitText, sin líneas de conexión) */
+.map-node-label {
+  position: absolute;
+  top: calc(100% + var(--space-xs));
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 190px;
+  max-width: 240px;
+  padding: var(--space-sm);
+  background-color: rgba(10, 10, 10, 0.95);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+  color: var(--color-light-warm);
+  font-family: var(--font-title);
+  font-style: italic;
+  font-size: 0.84rem;
+  line-height: 1.35;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.map-node-btn:hover .map-node-label,
+.map-node-btn:focus-visible .map-node-label,
+.map-node-btn.is-hovered .map-node-label {
+  opacity: 1;
+  visibility: visible;
+}
+
+.map-node-hint {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   SECCIÓN 2 — REUNIR INDICIOS (DRAGGABLE + INERTIA + FLIP)
+   ========================================================================== */
+.indicios-board {
+  position: relative;
+  width: 100%;
+  height: 54dvh;
+  min-height: 410px;
+  border: 1px solid rgba(75, 58, 42, 0.45);
+  border-radius: 6px;
+  background: radial-gradient(circle at center, rgba(75, 58, 42, 0.22) 0%, rgba(10, 10, 10, 0.92) 75%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.expediente-dropzone {
+  position: relative;
+  width: clamp(175px, 22vw, 240px);
+  min-height: clamp(175px, 22vw, 230px);
+  padding: var(--space-sm);
+  border: 1px dashed var(--color-border-subtle);
+  border-radius: 6px;
+  background-color: rgba(10, 10, 10, 0.72);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  z-index: 5;
+  transition: border-color 0.4s ease, background-color 0.4s ease;
+}
+
+.expediente-dropzone.is-over {
+  border-color: var(--color-light-warm);
+  background-color: rgba(75, 58, 42, 0.42);
+}
+
+.expediente-folder-img {
+  width: clamp(88px, 11vw, 124px);
+  height: auto;
+  object-fit: contain;
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+.expediente-caption {
+  font-size: 0.8rem;
+  color: var(--color-light-warm);
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+.expediente-slots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  width: 100%;
+}
+
+.indicio-item {
+  position: absolute;
+  width: clamp(72px, 8.5vw, 92px);
+  height: clamp(72px, 8.5vw, 92px);
+  padding: var(--space-xs);
+  border-radius: 6px;
+  background-color: rgba(51, 51, 51, 0.65);
+  border: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: grab;
+  z-index: 12;
+  user-select: none;
+  touch-action: none;
+}
+
+.indicio-item:active {
+  cursor: grabbing;
+}
+
+.indicio-item.is-collected {
+  position: relative;
+  top: auto !important;
+  left: auto !important;
+  width: 48px;
+  height: 48px;
+  padding: 6px;
+  cursor: default;
+  border-color: var(--color-light-warm);
+  background-color: rgba(77, 27, 7, 0.65);
+}
+
+.indicio-item img {
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+  pointer-events: none;
+  border-radius: 3px;
+}
+
+.indicio-name {
+  font-size: 0.68rem;
+  color: var(--color-white);
+  text-align: center;
+  line-height: 1.1;
+  pointer-events: none;
+}
+
+.indicio-item.is-collected .indicio-name {
+  display: none;
+}
+
+/* ==========================================================================
+   SECCIÓN 3 — LIBROS Y TERRITORIOS POR PAREJAS (TICKER + PHYSICS2D)
+   ========================================================================== */
+.pares-arena {
+  position: relative;
+  width: 100%;
+  height: 54dvh;
+  min-height: 410px;
+  border: 1px solid rgba(75, 58, 42, 0.45);
+  border-radius: 6px;
+  background: radial-gradient(circle at 50% 50%, rgba(51, 51, 51, 0.28) 0%, rgba(10, 10, 10, 0.92) 80%);
+  overflow: hidden;
+}
+
+.par-token {
+  position: absolute;
+  width: clamp(82px, 10vw, 108px);
+  height: clamp(82px, 10vw, 108px);
+  padding: 10px;
+  border-radius: 8px;
+  background-color: rgba(10, 10, 10, 0.88);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  z-index: 10;
+}
+
+.par-token:active {
+  cursor: grabbing;
+}
+
+/* Patrones y símbolos distintos por par para accesibilidad (daltonismo) */
+.par-token[data-pair="par-a"] {
+  border: 2px solid var(--color-light-warm);
+}
+
+.par-token[data-pair="par-b"] {
+  border: 2px dashed var(--color-white);
+}
+
+.par-token[data-pair="par-c"] {
+  border: 3px double var(--color-earth);
+  outline: 1px solid var(--color-light-warm);
+}
+
+.par-symbol-badge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 0.72rem;
+  font-family: var(--font-title);
+  color: var(--color-light-warm);
+  pointer-events: none;
+}
+
+.par-token img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.par-token-label {
+  font-size: 0.68rem;
+  color: var(--color-white);
+  text-align: center;
+  line-height: 1.1;
+  pointer-events: none;
+}
+
+.fragment-block {
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid rgba(255, 235, 153, 0.14);
+  opacity: 0;
+}
+
+.fragment-block.is-visible {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   SECCIÓN 4 — ROMPECABEZAS DE MEMORIA (3x3 MÓVIL / 4x4 ESCRITORIO)
+   ========================================================================== */
+.puzzle-stage {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.puzzle-board {
+  position: relative;
+  width: min(86vw, 420px);
+  aspect-ratio: 3 / 2;
+  background-color: rgba(51, 51, 51, 0.28);
+  border: 1px solid var(--color-border-subtle);
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols, 3), 1fr);
+  grid-template-rows: repeat(var(--grid-rows, 3), 1fr);
+  gap: 2px;
+  padding: 2px;
+  border-radius: 4px;
+  transition: gap 0.8s ease, padding 0.8s ease, border-color 0.8s ease;
+}
+
+.puzzle-board.is-seamless {
+  gap: 0;
+  padding: 0;
+  border-color: var(--color-light-warm);
+}
+
+.puzzle-cell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(10, 10, 10, 0.65);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.puzzle-board.is-seamless .puzzle-cell {
+  border-color: transparent;
+}
+
+/* Silueta vacía opcional para la última pieza en alusión a la ausencia */
+.puzzle-cell.is-empty-silhouette {
+  background-color: var(--color-bg-deep);
+  border: 1px solid rgba(255, 235, 153, 0.35);
+  box-shadow: inset 0 0 18px rgba(77, 27, 7, 0.65);
+}
+
+.puzzle-tray {
+  position: relative;
+  width: min(90vw, 460px);
+  min-height: 120px;
+  padding: var(--space-sm);
+  background-color: rgba(51, 51, 51, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.puzzle-piece {
+  width: var(--piece-w, 72px);
+  height: var(--piece-h, 48px);
+  background-repeat: no-repeat;
+  border: 1px solid rgba(255, 235, 153, 0.45);
+  border-radius: 2px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  z-index: 15;
+}
+
+.puzzle-piece.is-locked {
+  width: 100% !important;
+  height: 100% !important;
+  border-color: transparent;
+  cursor: default;
+  z-index: 2;
+}
